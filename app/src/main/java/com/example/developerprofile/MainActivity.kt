@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -97,9 +99,7 @@ fun ProfileCard(
             location = profile.location,
             isAvailable = profile.isAvailable,
         )
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            profile.skills.forEach { skill -> ProfileSkill(skill) }
-        }
+        SkillsSection(profile.skills)
         ContactButton(
             isAvailable = profile.isAvailable,
             contact = profile.contact,
@@ -215,8 +215,30 @@ fun ProfileDescription(desc: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ProfileSkill(skill: String, modifier: Modifier = Modifier) {
-    Text(text = "• $skill", modifier = modifier.padding(start = 8.dp), style = MaterialTheme.typography.bodySmall)
+fun SkillsSection(skills: List<String>, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "Skills", style = MaterialTheme.typography.titleMedium)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(skills) { skill ->
+                SkillChip(skill)
+            }
+        }
+    }
+}
+
+@Composable
+fun SkillChip(skill: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = MaterialTheme.shapes.small,
+    ) {
+        Text(
+            text = skill,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
+    }
 }
 
 @Composable
@@ -230,7 +252,7 @@ fun ContactButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun DeveloperProfileScreenPreview() {
     DeveloperProfileTheme {
@@ -240,26 +262,8 @@ fun DeveloperProfileScreenPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileCardNotAvailablePreview() {
-    val p = getExpertDevProfile()
-    DeveloperProfileTheme {
-        ProfileCard(p)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 fun DarkDeveloperProfileScreenPreview() {
     DeveloperProfileTheme(darkTheme = true) {
         DeveloperProfileScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DarkProfileCardNotAvailablePreview() {
-    val p = getExpertDevProfile()
-    DeveloperProfileTheme(darkTheme = true) {
-        ProfileCard(p)
     }
 }
