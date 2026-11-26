@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +18,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.developerprofile.data.DevProfile
+import com.example.developerprofile.data.Project
 import com.example.developerprofile.data.getDevProfile
 import com.example.developerprofile.data.getExpertDevProfile
 import com.example.developerprofile.ui.theme.DeveloperProfileTheme
@@ -71,40 +74,45 @@ fun DeveloperProfileScreen(modifier: Modifier = Modifier) {
 
     Surface(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxSize(),
     ) {
-        ProfileCard(p)
+        ProfileContent(p)
     }
 }
 
 
 @Composable
-fun ProfileCard(
+fun ProfileContent(
     profile: DevProfile,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-            .padding(16.dp),
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        ProfileHeader(profile.name, profile.title, profile.isAvailable)
-        ProfileDescription(profile.desc)
-        ContactInfoCard(
-            email = profile.email,
-            phone = profile.contact,
-            location = profile.location,
-            isAvailable = profile.isAvailable,
-        )
-        SkillsSection(profile.skills)
-        ContactButton(
-            isAvailable = profile.isAvailable,
-            contact = profile.contact,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        item { ProfileHeader(profile.name, profile.title, profile.isAvailable) }
+        item { ProfileDescription(profile.desc) }
+        item {
+            ContactInfoCard(
+                email = profile.email,
+                phone = profile.contact,
+                location = profile.location,
+                isAvailable = profile.isAvailable,
+            )
+        }
+        item { SkillsSection(profile.skills) }
+        item { Text(text = "Projects", style = MaterialTheme.typography.titleMedium) }
+        items(profile.projects) { project ->
+            ProjectCard(project)
+        }
+        item {
+            ContactButton(
+                isAvailable = profile.isAvailable,
+                contact = profile.contact,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -238,6 +246,29 @@ fun SkillChip(skill: String, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
         )
+    }
+}
+
+@Composable
+fun ProjectCard(project: Project, modifier: Modifier = Modifier) {
+    Card(modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
+        Row(modifier = Modifier.padding(16.dp)) {
+            Icon(
+                imageVector = Icons.Default.Build,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(text = project.name, style = MaterialTheme.typography.titleSmall)
+                Text(text = project.description, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = project.technologies,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
     }
 }
 
