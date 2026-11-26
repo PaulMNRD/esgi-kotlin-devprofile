@@ -20,9 +20,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,6 +91,12 @@ fun ProfileCard(
     ) {
         ProfileHeader(profile.name, profile.title, profile.isAvailable)
         ProfileDescription(profile.desc)
+        ContactInfoCard(
+            email = profile.email,
+            phone = profile.contact,
+            location = profile.location,
+            isAvailable = profile.isAvailable,
+        )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             profile.skills.forEach { skill -> ProfileSkill(skill) }
         }
@@ -124,7 +139,6 @@ fun ProfileHeader(
     }
 }
 
-// Placeholder avatar with a small badge showing if the developer is available
 @Composable
 fun ProfileAvatar(isAvailable: Boolean, modifier: Modifier = Modifier) {
     val badgeColor = if (isAvailable) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
@@ -149,6 +163,50 @@ fun ProfileAvatar(isAvailable: Boolean, modifier: Modifier = Modifier) {
                 .background(badgeColor, CircleShape),
         )
     }
+}
+
+@Composable
+fun ContactInfoCard(
+    email: String,
+    phone: String,
+    location: String,
+    isAvailable: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Card(modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(text = "Contact", style = MaterialTheme.typography.titleMedium)
+            InfoField(label = "Email", value = email, icon = Icons.Default.Email)
+            InfoField(label = "Phone", value = phone, icon = Icons.Default.Phone)
+            InfoField(label = "Location", value = location, icon = Icons.Default.LocationOn)
+            InfoField(
+                label = "Availability",
+                value = if (isAvailable) "Available for new projects" else "Not available",
+                icon = if (isAvailable) Icons.Default.CheckCircle else Icons.Default.Close,
+            )
+        }
+    }
+}
+
+@Composable
+fun InfoField(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        readOnly = true,
+        label = { Text(label) },
+        leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
+        singleLine = true,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
