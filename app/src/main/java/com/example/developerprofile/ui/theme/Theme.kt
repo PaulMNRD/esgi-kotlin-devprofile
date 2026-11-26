@@ -1,58 +1,70 @@
 package com.example.developerprofile.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = LatteBlue,
+    onPrimary = LatteBase,
+    primaryContainer = LatteSurface1,
+    onPrimaryContainer = LatteText,
+    secondary = LatteTeal,
+    onSecondary = LatteBase,
+    secondaryContainer = LatteSurface1,
+    onSecondaryContainer = LatteText,
+    tertiary = LatteMauve,
+    onTertiary = LatteBase,
+    error = LatteRed,
+    onError = LatteBase,
+    background = LatteBase,
+    onBackground = LatteText,
+    surface = LatteBase,
+    onSurface = LatteText,
+    surfaceVariant = LatteSurface0,
+    onSurfaceVariant = LatteSubtext0,
+    surfaceContainer = LatteMantle,
+    surfaceContainerHighest = LatteSurface0,
+    outline = LatteOverlay0,
+)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val DarkColorScheme = darkColorScheme(
+    primary = MochaBlue,
+    onPrimary = MochaBase,
+    primaryContainer = MochaSurface1,
+    onPrimaryContainer = MochaText,
+    secondary = MochaTeal,
+    onSecondary = MochaBase,
+    secondaryContainer = MochaSurface1,
+    onSecondaryContainer = MochaText,
+    tertiary = MochaMauve,
+    onTertiary = MochaBase,
+    error = MochaRed,
+    onError = MochaBase,
+    background = MochaBase,
+    onBackground = MochaText,
+    surface = MochaBase,
+    onSurface = MochaText,
+    surfaceVariant = MochaSurface0,
+    onSurfaceVariant = MochaSubtext0,
+    surfaceContainer = MochaMantle,
+    surfaceContainerHighest = MochaSurface0,
+    outline = MochaOverlay0,
 )
 
 @Composable
 fun DeveloperProfileTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }

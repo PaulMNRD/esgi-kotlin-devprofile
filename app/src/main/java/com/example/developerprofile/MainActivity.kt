@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -120,14 +121,26 @@ fun DeveloperProfileScreenPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileCardPreview() {
-    val p = getDevProfile()
-    ProfileCard(p)
+fun ProfileCardNotAvailablePreview() {
+    val p = getExpertDevProfile()
+    DeveloperProfileTheme {
+        ProfileCard(p)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileCardNotAvailablePreview() {
+fun DarkDeveloperProfileScreenPreview() {
+    DeveloperProfileTheme(darkTheme = true) {
+        DeveloperProfileScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DarkProfileCardNotAvailablePreview() {
     val p = getExpertDevProfile()
-    ProfileCard(p)
+    DeveloperProfileTheme(darkTheme = true) {
+        ProfileCard(p)
+    }
 }
