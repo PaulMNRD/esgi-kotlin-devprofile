@@ -30,10 +30,13 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -107,10 +110,10 @@ fun ProfileContent(
             ProjectCard(project)
         }
         item {
-            ContactButton(
+            ActionButtons(
                 isAvailable = profile.isAvailable,
-                contact = profile.contact,
-                modifier = Modifier.fillMaxWidth(),
+                onContactClick = {},
+                onPortfolioClick = {},
             )
         }
     }
@@ -273,13 +276,41 @@ fun ProjectCard(project: Project, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ContactButton(
+fun ActionButtons(
     isAvailable: Boolean,
-    contact: String,
+    onContactClick: () -> Unit,
+    onPortfolioClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Button(onClick = {}, modifier, enabled = isAvailable) {
-        Text("Passer un appel: $contact")
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Button(
+            onClick = onContactClick,
+            enabled = isAvailable,
+            modifier = Modifier.weight(1f),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Phone,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize),
+            )
+            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+            Text("Contact")
+        }
+        OutlinedButton(
+            onClick = onPortfolioClick,
+            modifier = Modifier.weight(1f),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Share,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize),
+            )
+            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+            Text("Portfolio")
+        }
     }
 }
 
