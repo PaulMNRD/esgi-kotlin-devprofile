@@ -72,14 +72,15 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun DeveloperProfileScreen(modifier: Modifier = Modifier) {
-    val p = getDevProfile()
-
+fun DeveloperProfileScreen(
+    modifier: Modifier = Modifier,
+    profile: DevProfile = getDevProfile(),
+) {
     Surface(
         modifier = modifier
             .fillMaxSize(),
     ) {
-        ProfileContent(p)
+        ProfileContent(profile)
     }
 }
 
@@ -314,7 +315,7 @@ fun ActionButtons(
     }
 }
 
-@Preview(showBackground = false)
+@Preview(name = "Light theme", showBackground = true, heightDp = 1100)
 @Composable
 fun DeveloperProfileScreenPreview() {
     DeveloperProfileTheme {
@@ -322,10 +323,18 @@ fun DeveloperProfileScreenPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Dark theme", showBackground = true, heightDp = 1100)
 @Composable
 fun DarkDeveloperProfileScreenPreview() {
     DeveloperProfileTheme(darkTheme = true) {
         DeveloperProfileScreen()
+    }
+}
+
+@Preview(name = "Not available", showBackground = true, heightDp = 900)
+@Composable
+fun NotAvailableProfileScreenPreview() {
+    DeveloperProfileTheme {
+        DeveloperProfileScreen(profile = getExpertDevProfile())
     }
 }
