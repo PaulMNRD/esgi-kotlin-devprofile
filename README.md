@@ -1,53 +1,89 @@
 # Compose Developer Profile
 
+> **Note:** this repository contains the second assignment (UI improvements).
+> The first assignment is available at the [`CC1`](../../tree/CC1) tag.
+
 ## Description
 
-This app displays a developer's profile card built with Jetpack Compose.
-The card shows the developer's name and job title, a short description, and a list of skills.
-At the bottom, a "call" button shows the developer's phone number. It is enabled only when the developer is available.
-The data comes from a `DevProfile` data class, so the same card can show any developer.
+This Android app, built with Jetpack Compose and Material Design 3, displays the profile of a developer.
+The screen shows:
 
-## Compose concepts used
+- a header with a placeholder avatar, an availability badge, the developer's name and job title;
+- a short description;
+- a contact card (email, phone, location and availability);
+- a horizontal list of skills;
+- a list of projects;
+- two action buttons: "Contact" and "Portfolio".
 
-- **Composables**: the UI is split into small `@Composable` functions.
-- **Parameters**: each composable gets its data (`name`, `title`, `skills`, `isAvailable`, ...) as parameters.
-- **Modifiers**: every composable accepts an optional `modifier: Modifier = Modifier`. The code also uses `padding`, `fillMaxWidth`, `fillMaxSize` and `background`.
-- **Outer / inner padding**: `ProfileCard` adds padding before and after `background()`.
-- **Callbacks**: `Button(onClick = ...)` in `ContactButton`.
-- **Previews**: three `@Preview` functions (full screen, available profile, unavailable profile).
-- **Basic accessibility**: real text labels, a disabled state that is announced, and theme typography.
-- **Layouts**: `Scaffold`, `Surface`, `Column` with `Arrangement.spacedBy`.
-- **Material 3 theming**: `MaterialTheme.colorScheme` and `MaterialTheme.typography`.
+All the data is local: it is written directly in Kotlin in `data/DevProfile.kt`.
+The buttons do not trigger a real action, their callbacks are empty.
 
-## Short explanation
+## Compose components used
 
-**1. Which composables did you create?**
-`DeveloperProfileScreen`, `ProfileCard`, `ProfileHeader`, `ProfileDescription`, `ProfileSkill`, `ContactButton`, and three previews: `DeveloperProfileScreenPreview`, `ProfileCardPreview` and `ProfileCardNotAvailablePreview`.
+| Component | Where |
+|---|---|
+| `Text` | Name, title, description, section titles, skills, projects |
+| `Button` / `OutlinedButton` | "Contact" and "Portfolio" actions in `ActionButtons` |
+| `Icon` | Contact fields, project cards and action buttons |
+| `Image` | Placeholder avatar in `ProfileAvatar` |
+| `Card` | `ContactInfoCard` and `ProjectCard` |
+| `OutlinedTextField` (read-only) | `InfoField`, used for email, phone, location and availability |
+| `Surface` | Screen background, header zone and `SkillChip` |
+| `Scaffold` | Root of the screen in `MainActivity` |
 
-**2. Which composable is the main screen?**
-`DeveloperProfileScreen`. `MainActivity` calls it inside a `Scaffold` and passes it the `innerPadding` from the Scaffold.
+## Layouts used
 
-**3. Where do you use outer padding?**
-In `ProfileCard`, the first `.padding(16.dp)` comes **before** `.background(...)`. It creates space around the card, between the card and the screen edges. `ProfileSkill` also uses `padding(start = 8.dp)` to indent each skill.
-I also managed outer padding using `verticalArrangement`, which is a regular spacing between elements.
+| Layout | Where |
+|---|---|
+| `Column` | Header texts, contact card, skills section, project card texts |
+| `Row` | Header (avatar + texts), project card (icon + texts), action buttons |
+| `Box` | `ProfileAvatar`: the availability badge is drawn on top of the avatar |
+| `Spacer` | Space between the avatar and the texts, between icons and texts |
+| `Surface` | Colored zone around the header, using the theme colors and shapes |
+| `LazyColumn` | The whole screen |
+| `LazyRow` | The list of skills |
 
-**4. Where do you use inner padding?**
-In `ProfileCard`, the second `.padding(16.dp)` comes **after** `.background(...)`. It creates space inside the rounded card, between its edge and the text.
+## Lists with LazyColumn and LazyRow
 
-**5. Which component receives a callback?**
-The Material `Button` in `ContactButton` receives the `onClick` callback, which is meant to start the phone call. The button is enabled only when `isAvailable` is `true`.
+- **`LazyColumn`** (`ProfileContent`) is the main layout of the screen, so the whole screen can scroll.
+  Each section is added with `item { ... }`.
+  The projects are added with `items(profile.projects) { project -> ProjectCard(project) }`:
+  each project is displayed by the reusable `ProjectCard` composable.
+- **`LazyRow`** (`SkillsSection`) displays the skills horizontally with `items(skills) { skill -> SkillChip(skill) }`.
+  When there are too many skills for the screen width, the row scrolls horizontally.
 
-**6. What accessibility information did you add?**
-- The button label is real text (`"Passer un appel: <number>"`), so TalkBack reads what the button does and which number it calls.
-- `enabled = isAvailable` means TalkBack announces the button as *disabled* when the developer is unavailable.
-- All information is shown as `Text` (no icon without a label), so screen readers can read everything.
+Lazy lists only compose the items that are visible on screen, so they stay efficient even with long lists.
 
-**7. Why can your components be considered reusable?**
-- Each composable gets its data through parameters instead of hard-coded values.
-- Each one accepts an optional `Modifier`, so the caller can change its size and position.
-- `ProfileCard` takes a `DevProfile` object. The previews show the same card with two different profiles (`getDevProfile()` and `getExpertDevProfile()`).
-- Each component does one job (header, description, skill, button), so they can be reused in other screens.
+## Theme choices
 
-## Screenshot
+The theme is defined in `ui/theme/` and uses the [Catppuccin](https://catppuccin.com/palette) palettes:
 
-![Developer profile preview](docs/screenshot.png)
+- **Light theme**: Catppuccin Latte;
+- **Dark theme**: Catppuccin Mocha.
+
+The theme follows the system setting with `isSystemInDarkTheme()`.
+Both color schemes map the Catppuccin colors to the same Material 3 roles:
+`primary` is Blue, `secondary` is Teal, `tertiary` is Mauve, `background` and `surface` are Base, text is Text, etc.
+
+The theme also customizes:
+
+- **`MaterialTheme.typography`** (`Type.kt`): `headlineSmall` (bold) for the name, `titleMedium` (semi-bold) for section titles;
+- **`MaterialTheme.shapes`** (`Shape.kt`): `small` (8 dp) for skill chips, `medium` (12 dp) for cards, `large` (16 dp) for the header.
+
+Components never use hard-coded colors: they always use `MaterialTheme.colorScheme`, so both themes work automatically.
+
+## Screenshots
+
+| Light theme | Dark theme |
+|---|---|
+| ![Light theme](docs/screenshot-light.png) | ![Dark theme](docs/screenshot-dark.png) |
+
+## Which Compose UI notions did you reuse in this app?
+
+- **Basic components**: `Text`, `Button`, `OutlinedButton`, `Icon`, `Image`, `Card` and a read-only `OutlinedTextField`.
+- **Layouts**: `Column`, `Row`, `Box` (avatar with a badge), `Spacer` and `Surface`.
+- **Lazy lists**: a `LazyColumn` for the whole screen and the projects, and a `LazyRow` for the skills.
+- **Reusable cards**: `ProjectCard`, `SkillChip`, `InfoField` and `ContactInfoCard` get their data as parameters and accept a `Modifier`.
+- **Material Design 3**: a custom `colorScheme`, `typography` and `shapes`.
+- **Light / dark theme**: two color schemes (Catppuccin Latte and Mocha), and previews for both themes.
+- **Previews**: light theme, dark theme and an unavailable profile.
