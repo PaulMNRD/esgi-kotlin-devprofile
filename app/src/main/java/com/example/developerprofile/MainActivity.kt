@@ -22,6 +22,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.developerprofile.data.DevProfile
+import com.example.developerprofile.data.getDevProfile
+import com.example.developerprofile.data.getExpertDevProfile
 import com.example.developerprofile.ui.theme.DeveloperProfileTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DeveloperProfileScreen(modifier: Modifier = Modifier) {
-    val p = getDevProfile();
+    val p = getDevProfile()
 
     Surface(
         modifier = modifier
@@ -128,33 +131,3 @@ fun ProfileCardNotAvailablePreview() {
     val p = getExpertDevProfile()
     ProfileCard(p)
 }
-
-fun getDevProfile(): DevProfile {
-    return DevProfile(
-        "Paul Menard",
-        "Développeur Web Full Stack",
-        "Passionné par le web et le développement mobile.",
-        listOf("Kotlin", "Compose"),
-        "06 00 00 00 00",
-        true,
-    )
-}
-
-fun getExpertDevProfile(): DevProfile {
-    return DevProfile(
-        name = "Camille Martin",
-        title = "Développeur Android Senior",
-        desc = "10 ans d'expérience sur des applications Android natives.",
-        skills = listOf("Java", "Android"),
-        contact = "06 01 01 01 01",
-        isAvailable = false
-    )
-}
-data class DevProfile(
-    val name: String,
-    val title: String,
-    val desc: String,
-    val skills: List<String>,
-    val contact: String,
-    val isAvailable: Boolean,
-)
