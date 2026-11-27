@@ -107,7 +107,7 @@ fun ProfileContent(
     }
 }
 
-@Preview(name = "Light theme", showBackground = true, heightDp = 1100)
+@Preview(name = "Default - light theme", showBackground = true, heightDp = 1100)
 @Composable
 fun DeveloperProfileScreenPreview() {
     DeveloperProfileTheme {
@@ -120,12 +120,33 @@ fun DeveloperProfileScreenPreview() {
     }
 }
 
-@Preview(name = "Dark theme", showBackground = true, heightDp = 1100)
+@Preview(name = "Default - dark theme", showBackground = true, heightDp = 1100)
 @Composable
 fun DarkDeveloperProfileScreenPreview() {
     DeveloperProfileTheme(darkTheme = true) {
         DeveloperProfileScreen(
             uiState = ProfileUiState(profile = getDevProfile()),
+            onSearchQueryChange = {},
+            onToggleFavoriteFilter = {},
+            onFavoriteClick = {},
+        )
+    }
+}
+
+@Preview(name = "Search and favorites", showBackground = true, heightDp = 900)
+@Composable
+fun SearchAndFavoritesScreenPreview() {
+    val profile = getDevProfile()
+
+    DeveloperProfileTheme {
+        DeveloperProfileScreen(
+            uiState = ProfileUiState(
+                profile = profile,
+                searchQuery = "Kotlin",
+                showOnlyFavorites = true,
+                favoriteProjectIds = setOf(1, 2, 4),
+                projects = profile.projects.filter { project -> project.id == 1 || project.id == 4 },
+            ),
             onSearchQueryChange = {},
             onToggleFavoriteFilter = {},
             onFavoriteClick = {},
