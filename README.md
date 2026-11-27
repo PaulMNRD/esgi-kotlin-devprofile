@@ -1,89 +1,106 @@
-# Compose Developer Profile
+# Interactive Developer Profile
 
-> **Note:** this repository contains the second assignment (UI improvements).
+> **Note:** this repository contains the third assignment (state management).
 > The first assignment is available at the [`CC1`](../../tree/CC1) tag.
+> The second assignment is available at the [`CC2`](../../tree/CC2) tag.
 
 ## Description
 
-This Android app, built with Jetpack Compose and Material Design 3, displays the profile of a developer.
-The screen shows:
+This Android app, built with Jetpack Compose and Material Design 3, displays the profile of a developer
+as a small interactive portfolio.
 
-- a header with a placeholder avatar, an availability badge, the developer's name and job title;
-- a short description;
-- a contact card (email, phone, location and availability);
-- a horizontal list of skills;
-- a list of projects;
-- two action buttons: "Contact" and "Portfolio".
+The screen shows the developer's header, description, contact card, skills, projects and action buttons.
+The user can now:
 
-All the data is local: it is written directly in Kotlin in `data/DevProfile.kt`.
-The buttons do not trigger a real action, their callbacks are empty.
+- search a project by its name, its description or a technology;
+- add a project to the favorites, or remove it, with the heart icon;
+- display all the projects, or only the favorite ones, with the "Favorites only" chip;
+- see the number of projects currently displayed ("5 projects displayed", "1 project displayed"...);
+- show or hide the contact information.
 
-## Compose components used
+All the data stays local: it is written directly in Kotlin in `data/DevProfile.kt`.
 
-| Component | Where |
+## States managed by the app
+
+The main state of the screen is grouped in `ProfileUiState` and managed by `ProfileViewModel`:
+
+| State | Type | Role |
+|---|---|---|
+| `profile` | `DevProfile` | Data of the developer (name, skills, projects...) |
+| `searchQuery` | `String` | Text typed in the search field |
+| `showOnlyFavorites` | `Boolean` | Whether the "Favorites only" filter is active |
+| `favoriteProjectIds` | `Set<Int>` | Ids of the projects marked as favorites |
+| `projects` | `List<Project>` | Projects displayed, after the search and the favorites filter |
+
+## Local state
+
+The `showDetails` state of `ContactInfoCard`, which shows or hides the contact information:
+
+```kotlin
+var showDetails by rememberSaveable { mutableStateOf(false) }
+```
+
+It is only a display detail of this card: no other part of the screen needs it, and it does not change
+the data of the app. Putting it in the ViewModel would add code without any benefit.
+I used `rememberSaveable` instead of `remember` so the value is kept when the screen is rotated.
+
+## State Hoisting
+
+`DeveloperProfileScreen` does not create or store any state. It receives:
+
+- the values to display, with the `uiState: ProfileUiState` parameter;
+- the user actions, as callbacks: `onSearchQueryChange`, `onToggleFavoriteFilter` and `onFavoriteClick`.
+
+When the user types in the search field or clicks on a heart, the screen only calls the callback.
+It does not decide how the state is stored or updated: this is the job of the ViewModel.
+Thanks to this, the screen can be displayed in a preview with any state, without a ViewModel.
+
+## ViewModel
+
+`ProfileViewModel` owns the main state of the screen and contains the actions of the user:
+
+- `onSearchQueryChange(query)` updates the search text;
+- `onToggleFavoriteFilter()` turns the "Favorites only" filter on or off;
+- `onFavoriteClick(projectId)` adds the project to the favorites, or removes it if it is already one.
+
+After each action, it computes again the list of displayed projects (search + favorites filter)
+and publishes the new state. The ViewModel does not depend on any Compose UI component.
+It also survives configuration changes, like a screen rotation, so the search and the favorites are not lost.
+
+## StateFlow
+
+The ViewModel keeps a private `MutableStateFlow<ProfileUiState>` that only it can modify,
+and exposes a public read-only `StateFlow<ProfileUiState>`.
+
+In `ProfileContainer`, the state is collected with `collectAsState()`.
+Each time the ViewModel puts a new value in the `StateFlow`, `collectAsState()` receives it,
+and Compose recomposes the screen with this new state.
+
+```
+ViewModel ──publishes a state──▶ ProfileContainer ──passes the state──▶ DeveloperProfileScreen
+    ▲                                                                       │
+    └──────────────────────── event (callback) ─────────────────────────────┘
+```
+
+## Code organization
+
+| Element | Role |
 |---|---|
-| `Text` | Name, title, description, section titles, skills, projects |
-| `Button` / `OutlinedButton` | "Contact" and "Portfolio" actions in `ActionButtons` |
-| `Icon` | Contact fields, project cards and action buttons |
-| `Image` | Placeholder avatar in `ProfileAvatar` |
-| `Card` | `ContactInfoCard` and `ProjectCard` |
-| `OutlinedTextField` (read-only) | `InfoField`, used for email, phone, location and availability |
-| `Surface` | Screen background, header zone and `SkillChip` |
-| `Scaffold` | Root of the screen in `MainActivity` |
-
-## Layouts used
-
-| Layout | Where |
-|---|---|
-| `Column` | Header texts, contact card, skills section, project card texts |
-| `Row` | Header (avatar + texts), project card (icon + texts), action buttons |
-| `Box` | `ProfileAvatar`: the availability badge is drawn on top of the avatar |
-| `Spacer` | Space between the avatar and the texts, between icons and texts |
-| `Surface` | Colored zone around the header, using the theme colors and shapes |
-| `LazyColumn` | The whole screen |
-| `LazyRow` | The list of skills |
-
-## Lists with LazyColumn and LazyRow
-
-- **`LazyColumn`** (`ProfileContent`) is the main layout of the screen, so the whole screen can scroll.
-  Each section is added with `item { ... }`.
-  The projects are added with `items(profile.projects) { project -> ProjectCard(project) }`:
-  each project is displayed by the reusable `ProjectCard` composable.
-- **`LazyRow`** (`SkillsSection`) displays the skills horizontally with `items(skills) { skill -> SkillChip(skill) }`.
-  When there are too many skills for the screen width, the row scrolls horizontally.
-
-Lazy lists only compose the items that are visible on screen, so they stay efficient even with long lists.
-
-## Theme choices
-
-The theme is defined in `ui/theme/` and uses the [Catppuccin](https://catppuccin.com/palette) palettes:
-
-- **Light theme**: Catppuccin Latte;
-- **Dark theme**: Catppuccin Mocha.
-
-The theme follows the system setting with `isSystemInDarkTheme()`.
-Both color schemes map the Catppuccin colors to the same Material 3 roles:
-`primary` is Blue, `secondary` is Teal, `tertiary` is Mauve, `background` and `surface` are Base, text is Text, etc.
-
-The theme also customizes:
-
-- **`MaterialTheme.typography`** (`Type.kt`): `headlineSmall` (bold) for the name, `titleMedium` (semi-bold) for section titles;
-- **`MaterialTheme.shapes`** (`Shape.kt`): `small` (8 dp) for skill chips, `medium` (12 dp) for cards, `large` (16 dp) for the header.
-
-Components never use hard-coded colors: they always use `MaterialTheme.colorScheme`, so both themes work automatically.
+| `MainActivity` | Entry point: applies the theme and displays `ProfileContainer` in a `Scaffold` |
+| `data/DevProfile.kt` | Local data: `DevProfile` and `Project` |
+| `ui/ProfileUiState` | Data class grouping the main state of the screen |
+| `ui/ProfileViewModel` | Manages the state, the user actions and the filtering of the projects |
+| `ui/ProfileContainer` | Gets the ViewModel, collects the `StateFlow` and passes the state and callbacks to the screen |
+| `ui/DeveloperProfileScreen` | Stateless screen, and its previews |
+| `ui/components/ProfileHeader` | Header with the avatar, name, title and description |
+| `ui/components/ContactInfoCard` | Contact card, with the local show / hide state |
+| `ui/components/SkillsSection` | Horizontal list of skills |
+| `ui/components/ProjectsSection` | Search field, favorites filter with the project count, and `ProjectCard` |
+| `ui/components/ActionButtons` | "Contact" and "Portfolio" buttons |
+| `ui/theme/` | Material 3 theme (Catppuccin Latte and Mocha colors, typography, shapes) |
 
 ## Screenshots
 
-| Light theme | Dark theme |
+| Default | Search and favorites |
 |---|---|
-| ![Light theme](docs/screenshot-light.png) | ![Dark theme](docs/screenshot-dark.png) |
-
-## Which Compose UI notions did you reuse in this app?
-
-- **Basic components**: `Text`, `Button`, `OutlinedButton`, `Icon`, `Image`, `Card` and a read-only `OutlinedTextField`.
-- **Layouts**: `Column`, `Row`, `Box` (avatar with a badge), `Spacer` and `Surface`.
-- **Lazy lists**: a `LazyColumn` for the whole screen and the projects, and a `LazyRow` for the skills.
-- **Reusable cards**: `ProjectCard`, `SkillChip`, `InfoField` and `ContactInfoCard` get their data as parameters and accept a `Modifier`.
-- **Material Design 3**: a custom `colorScheme`, `typography` and `shapes`.
-- **Light / dark theme**: two color schemes (Catppuccin Latte and Mocha), and previews for both themes.
-- **Previews**: light theme, dark theme and an unavailable profile.
+| ![Default](docs/screenshot-default.png) | ![Search and favorites](docs/screenshot-favorites.png) |
