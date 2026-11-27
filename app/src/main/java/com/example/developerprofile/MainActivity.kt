@@ -41,7 +41,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -185,20 +190,27 @@ fun ContactInfoCard(
     isAvailable: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    var showDetails by rememberSaveable { mutableStateOf(false) }
+
     Card(modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(text = "Contact", style = MaterialTheme.typography.titleMedium)
-            InfoField(label = "Email", value = email, icon = Icons.Default.Email)
-            InfoField(label = "Phone", value = phone, icon = Icons.Default.Phone)
-            InfoField(label = "Location", value = location, icon = Icons.Default.LocationOn)
-            InfoField(
-                label = "Availability",
-                value = if (isAvailable) "Available for new projects" else "Not available",
-                icon = if (isAvailable) Icons.Default.CheckCircle else Icons.Default.Close,
-            )
+            TextButton(onClick = { showDetails = !showDetails }) {
+                Text(if (showDetails) "Hide contact info" else "Show contact info")
+            }
+            if (showDetails) {
+                InfoField(label = "Email", value = email, icon = Icons.Default.Email)
+                InfoField(label = "Phone", value = phone, icon = Icons.Default.Phone)
+                InfoField(label = "Location", value = location, icon = Icons.Default.LocationOn)
+                InfoField(
+                    label = "Availability",
+                    value = if (isAvailable) "Available for new projects" else "Not available",
+                    icon = if (isAvailable) Icons.Default.CheckCircle else Icons.Default.Close,
+                )
+            }
         }
     }
 }
