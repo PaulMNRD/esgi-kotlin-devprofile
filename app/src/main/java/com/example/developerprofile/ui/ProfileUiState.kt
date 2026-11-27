@@ -8,6 +8,5 @@ data class ProfileUiState(
     val searchQuery: String = "",
     val showOnlyFavorites: Boolean = false,
     val favoriteProjectIds: Set<Int> = emptySet(),
-    // Projects displayed on screen, after the search and the favorites filter
     val projects: List<Project> = profile.projects,
 )

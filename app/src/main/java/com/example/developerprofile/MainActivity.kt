@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import com.example.developerprofile.data.Project
 import com.example.developerprofile.data.getDevProfile
 import com.example.developerprofile.data.getExpertDevProfile
+import com.example.developerprofile.ui.ProfileContainer
 import com.example.developerprofile.ui.ProfileUiState
 import com.example.developerprofile.ui.theme.DeveloperProfileTheme
 
@@ -74,14 +75,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DeveloperProfileTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Temporary: replaced by ProfileContainer in the next step
-                    DeveloperProfileScreen(
-                        uiState = ProfileUiState(profile = getDevProfile()),
-                        onSearchQueryChange = {},
-                        onToggleFavoriteFilter = {},
-                        onFavoriteClick = {},
-                        modifier = Modifier.padding(innerPadding),
-                    )
+                    ProfileContainer(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
